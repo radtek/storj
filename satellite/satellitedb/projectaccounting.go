@@ -634,8 +634,8 @@ func (db *ProjectAccounting) GetBucketTotals(ctx context.Context, projectID uuid
 // getBuckets list all bucket of certain project.
 func (db *ProjectAccounting) getBuckets(ctx context.Context, projectID uuid.UUID) (_ []string, err error) {
 	defer mon.Task()(&ctx)(&err)
-	bucketsQuery := db.db.Rebind(`SELECT DISTINCT bucket_name
-		FROM bucket_storage_tallies
+	bucketsQuery := db.db.Rebind(`SELECT DISTINCT name
+		FROM bucket_metainfos
 		WHERE project_id = ?`)
 
 	bucketRows, err := db.db.QueryContext(ctx, bucketsQuery, projectID[:])
