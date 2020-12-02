@@ -20,10 +20,12 @@ var (
 
 // Config is a configuration for overlay service.
 type Config struct {
-	Node                 NodeSelectionConfig
-	NodeSelectionCache   CacheConfig
-	UpdateStatsBatchSize int `help:"number of update requests to process per transaction" default:"100"`
-	AuditHistory         AuditHistoryConfig
+	Node                          NodeSelectionConfig
+	NodeSelectionCache            CacheConfig
+	UpdateStatsBatchSize          int `help:"number of update requests to process per transaction" default:"100"`
+	AuditHistory                  AuditHistoryConfig
+	AsOfSystemTimeEnabled         bool          `help:"enables the use of the AS OF SYSTEM TIME feature in CRDB" devDefault:"true" releaseDefault:"false"`
+	AsOfSystemTimeDefaultDuration time.Duration `help:"default duration for AS OF SYSTEM TIME" devDefault:"1µs" releaseDefault:"10s"`
 }
 
 // NodeSelectionConfig is a configuration struct to determine the minimum
