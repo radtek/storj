@@ -10,7 +10,6 @@ node('node') {
 
       echo "Current build result: ${currentBuild.result}"
     }
-    if (env.BRANCH_NAME == "master") {
         stage('Run Versions Test') {
             lastStage = env.STAGE_NAME
             try {
@@ -44,7 +43,6 @@ node('node') {
               sh 'docker rm redis-$BUILD_NUMBER || true'
             }
         }
-    }
 
     stage('Run Rolling Upgrade Test') {
         lastStage = env.STAGE_NAME
