@@ -22,9 +22,10 @@
                 <VList
                     :data-set="projectsPage.projects"
                     :item-component="itemComponent"
+                    :on-item-click="onProjectSelected"
                 />
             </div>
-            <div class="projects-list-items__pagination-area">
+            <div class="projects-list-items__pagination-area" v-if="projectsPage.pageCount > 1">
                 <VPagination
                     :total-page-count="projectsPage.pageCount"
                     :on-page-click-callback="onPageClick"
@@ -36,10 +37,15 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import { ProjectsApiGql } from '@/api/projects';
-import { ProjectsCursor, ProjectsPage, Project } from '@/types/projects';
-import { PROJECTS_ACTIONS } from '@/store/modules/projects';
+
 import { RouteConfig } from '@/router';
+import { ACCESS_GRANTS_ACTIONS } from '@/store/modules/accessGrants';
+import { BUCKET_ACTIONS } from '@/store/modules/buckets';
+import { PAYMENTS_ACTIONS } from '@/store/modules/payments';
+import { PROJECTS_ACTIONS } from '@/store/modules/projects';
+import { ProjectsCursor, ProjectsPage, Project } from '@/types/projects';
+import { PM_ACTIONS } from '@/utils/constants/actionNames';
+import { LocalData } from '@/utils/localData';
 
 import ProjectsListItem from '@/components/projectsList/ProjectsListItem.vue'
 import SortProjectsListHeader from '@/components/projectsList/SortProjectsListHeader.vue'
@@ -63,12 +69,12 @@ export default class Projects extends Vue {
 
     private currentPageNumber: number = 1;
 
-    private projectsApi: ProjectsApiGql = new ProjectsApiGql();
-
     private currentProjectsPage: ProjectsPage = new ProjectsPage();
 
+    private FIRST_PAGE = 1;
+
     /**
-     * Lifecycle hook after initial render where list of existing access grants is fetched.
+     * Lifecycle hook after initial render where list of existing ownded projects is fetched.
      */
     public async mounted(): Promise<void> {
         try {
@@ -78,6 +84,10 @@ export default class Projects extends Vue {
         }
     }
 
+    /**
+     * Fetches owned projects page page by clicked page number.
+     * @param index
+     */
     public async onPageClick(page: number): Promise<void> {
         this.currentPageNumber = page;
         try {
@@ -87,19 +97,47 @@ export default class Projects extends Vue {
         }
     }
 
+    /**
+     * Returns ProjectsList item component.
+     */
     public get itemComponent() {
         return ProjectsListItem;
     }
 
+    /**
+     * Redirects to create project page.
+     */
     public onCreateClick(): void {
         this.$router.push(RouteConfig.CreateProject.path);
     }
 
+    /**
+     * Returns projects page from store.
+     */
     public get projectsPage(): ProjectsPage {
         return this.$store.state.projectsModule.page;
     }
 
+    /**
+     * Fetches all project related information.
+     * @param project
+     */
+    public async onProjectSelected(project: Project): Promise<void> {
+        const projectID = project.id;
+        await this.$store.dispatch(PROJECTS_ACTIONS.SELECT, projectID);
+        LocalData.setSelectedProjectId(projectID);
+        await this.$store.dispatch(PM_ACTIONS.SET_SEARCH_QUERY, '');
 
+        try {
+            await this.$store.dispatch(PAYMENTS_ACTIONS.GET_PROJECT_USAGE_AND_CHARGES_CURRENT_ROLLUP);
+            await this.$store.dispatch(PM_ACTIONS.FETCH, this.FIRST_PAGE);
+            await this.$store.dispatch(ACCESS_GRANTS_ACTIONS.FETCH, this.FIRST_PAGE);
+            await this.$store.dispatch(BUCKET_ACTIONS.FETCH, this.FIRST_PAGE);
+            await this.$store.dispatch(PROJECTS_ACTIONS.GET_LIMITS, this.$store.getters.selectedProject.id);
+        } catch (error) {
+            await this.$notify.error(`Unable to select project. ${error.message}`);
+        }
+    }
 
 }
 </script>
@@ -121,7 +159,7 @@ export default class Projects extends Vue {
                 font-size: 22px;
                 line-height: 27px;
                 color: #263549;
-                margin: 0;
+                margin: 10px 0 0;
             }
         }
 

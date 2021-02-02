@@ -133,6 +133,7 @@ export function makeProjectsModule(api: ProjectsApi): StoreModule<ProjectsState>
             },
             [SET_PAGE_NUMBER](state: ProjectsState, pageNumber: number) {
                 state.cursor.page = pageNumber;
+                state.cursor.limit = 20;
             },
             [SET_PAGE](state: ProjectsState, page: ProjectsPage) {
                 state.page = page;

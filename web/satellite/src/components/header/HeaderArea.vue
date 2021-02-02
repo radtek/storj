@@ -50,12 +50,6 @@ export default class HeaderArea extends Vue {
         location.reload();
     }
 
-    /**
-     * Route to projects list page.
-     */
-    public onProjectsLinkClick(): void {
-        this.$router.push(RouteConfig.ProjectsList.path);
-    }
 }
 </script>
 

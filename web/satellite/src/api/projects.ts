@@ -144,6 +144,13 @@ export class ProjectsApiGql extends BaseGql implements ProjectsApi {
         throw new Error('can not get usage limits');
     }
 
+    /**
+     * Fetch owned projects.
+     *
+     * @returns ProjectsPage
+     * @throws Error
+     */
+
     public async getOwnedProjects(cursor: ProjectsCursor): Promise<ProjectsPage> {
         const query =
             `query($limit: Int!, $page: Int!) {

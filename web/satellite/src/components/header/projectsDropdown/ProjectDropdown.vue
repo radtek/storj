@@ -26,8 +26,7 @@
         <div class="project-dropdown__create-project" v-if="isCreateProjectButtonShown" @click.stop="onCreateProjectsClick">
             <div class="project-dropdown__create-project__border"/>
             <div class="project-dropdown__create-project__button-area">
-                <p class="project-dropdown__create-project__button-area__text">Create Projects</p>
-                <p class="project-dropdown__create-project__button-area__arrow">-></p>
+                <p @click.stop="onProjectsLinkClick" class="project-dropdown__create-project__button-area__text">Manage Projects</p>
             </div>
         </div>
     </div>
@@ -109,6 +108,14 @@ export default class ProjectDropdown extends Vue {
      * Closes dropdown.
      */
     public closeDropdown(): void {
+        this.$emit('close');
+    }
+
+    /**
+     * Route to projects list page.
+     */
+    public onProjectsLinkClick(): void {
+        this.$router.push(RouteConfig.ProjectsList.path);
         this.$emit('close');
     }
 }

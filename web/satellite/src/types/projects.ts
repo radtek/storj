@@ -146,7 +146,7 @@ export class ProjectPage {
 }
 
 /**
- * BucketPage class holds bucket total usages and flag whether more usages available.
+ * ProjectsPage class, used to describe paged projects list.
  */
 export class ProjectsPage {
     public constructor(
@@ -160,7 +160,7 @@ export class ProjectsPage {
 }
 
 /**
- * BucketCursor class holds cursor for bucket name and limit.
+ * ProjectsPage class, used to describe paged projects list.
  */
 export class ProjectsCursor {
     public constructor(
